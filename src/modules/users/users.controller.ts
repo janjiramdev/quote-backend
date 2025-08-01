@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user-decorator';
 import type { IUserInterface } from 'src/interfaces/users.interface';
+import { UserDocument } from 'src/schemas/user.schema';
 import { AccessTokenGuard } from '../auth/guards/access-token-guard';
 import { UpdateUserByIdDto } from './dtos/update-user-by-id.dto';
 import { UsersService } from './users.service';
@@ -11,9 +12,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('/profile')
-  async getProfile(
-    @CurrentUser() user: IUserInterface,
-  ): Promise<IUserInterface> {
+  async getProfile(@CurrentUser() user: IUserInterface): Promise<UserDocument> {
     return await this.usersService.getProfile(user._id);
   }
 
@@ -21,7 +20,7 @@ export class UsersController {
   async updateProfile(
     @CurrentUser() user: IUserInterface,
     @Body() body: UpdateUserByIdDto,
-  ): Promise<IUserInterface> {
+  ): Promise<UserDocument> {
     return await this.usersService.updateProfile(user._id, body);
   }
 }

@@ -6,10 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import {
-  ICreateOneUserInput,
-  IUserInterface,
-} from 'src/interfaces/users.interface';
+import { ICreateOneUserInput } from 'src/interfaces/users.interface';
 import { User, UserDocument } from 'src/schemas/user.schema';
 import { EncodeUtil } from 'src/utils/encode.util';
 import { UpdateUserByIdDto } from './dtos/update-user-by-id.dto';
@@ -50,13 +47,13 @@ export class UsersService {
     return await this.userModel.findOne({ _id: input }).exec();
   }
 
-  async getProfile(input: string): Promise<IUserInterface> {
+  async getProfile(input: string): Promise<UserDocument> {
     try {
       const user = await this.userModel.findOne({ _id: input }).exec();
       if (!user)
         throw new NotFoundException(`user with id: ${input} not found`);
 
-      return user as unknown as IUserInterface;
+      return user;
     } catch (error: unknown) {
       if (error instanceof Error)
         this.logger.error(error.stack ? error.stack : error.message);
@@ -68,7 +65,7 @@ export class UsersService {
   async updateProfile(
     id: string,
     input: UpdateUserByIdDto,
-  ): Promise<IUserInterface> {
+  ): Promise<UserDocument> {
     try {
       const { displayName, password } = input;
 
@@ -80,15 +77,11 @@ export class UsersService {
       const user = await this.findOneById(id);
       if (!user) throw new NotFoundException(`user with id: ${id} not found`);
 
-      const updateObject = {
-        ...(displayName && { displayName }),
-        ...(password && { password: this.encodeUtil.hashData(password) }),
-        updatedAt: new Date(),
-      };
+      if (displayName) user.displayName = displayName;
+      if (password) user.password = this.encodeUtil.hashData(password);
+      user.updatedAt = new Date();
 
-      return (await this.userModel
-        .findOneAndUpdate({ _id: id }, updateObject, { new: true })
-        .exec()) as unknown as IUserInterface;
+      return user.save();
     } catch (error: unknown) {
       if (error instanceof Error)
         this.logger.error(error.stack ? error.stack : error.message);

@@ -23,6 +23,6 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalFilters(new ResponseExceptionsFilter());
 
-  await app.listen(process.env.APP_PROT ?? 8080);
+  await app.listen(process.env.APP_PORT ?? 8080);
 }
 void bootstrap();

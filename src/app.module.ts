@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import systemConfig from './configs/system';
 import { AuthModule } from './modules/auth/auth.module';
+import { QuotesModule } from './modules/quotes/quotes.module';
 import { SystemModule } from './modules/system/system.module';
 import { UsersModule } from './modules/users/users.module';
 
@@ -20,6 +21,7 @@ import { UsersModule } from './modules/users/users.module';
       inject: [ConfigService],
     }),
     AuthModule,
+    QuotesModule,
     SystemModule,
     UsersModule,
   ],
