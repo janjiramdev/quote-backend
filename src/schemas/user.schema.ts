@@ -27,6 +27,14 @@ export class User {
     nullable: false,
   })
   createdAt: Date;
+
+  @Prop({
+    type: Date,
+    unique: false,
+    required: true,
+    nullable: false,
+  })
+  updatedAt: Date;
 }
 
 export type UserDocument = HydratedDocument<User>;

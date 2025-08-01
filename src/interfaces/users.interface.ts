@@ -1,7 +1,7 @@
 export interface IUserInterface {
   _id: string;
   username: string;
-  displayName: string;
+  displayName?: string;
 }
 
 export interface ICreateOneUserInput {
