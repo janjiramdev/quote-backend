@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  database:
+    image: mongo:8.0
+    container_name: quote-database
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: P@ssw0rd
+      MONGO_INITDB_DATABASE: datasource
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - mongodb-network
+
+volumes:
+  mongodb-data:
+
+networks:
+  mongodb-network:

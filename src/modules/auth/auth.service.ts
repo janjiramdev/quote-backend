@@ -1,0 +1,98 @@
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { ICreateOneUserInput } from 'src/interfaces/user.interface';
+import { UserDocument } from 'src/schemas/user.schema';
+import { EncodeUtil } from 'src/utils/encode.util';
+import { UsersService } from '../users/users.service';
+import { SigninDto } from './dtos/signin.dto';
+import { SignupDto } from './dtos/singup.dto';
+
+@Injectable()
+export class AuthService {
+  private readonly logger: Logger;
+  private readonly encodeUtil: EncodeUtil;
+
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
+  ) {
+    this.logger = new Logger(AuthService.name);
+    this.encodeUtil = new EncodeUtil();
+  }
+
+  async signup(input: SignupDto): Promise<UserDocument> {
+    const { username, displayName, password } = input;
+
+    try {
+      const existingUser = await this.usersService.findOneByUsername(username);
+      if (existingUser)
+        throw new BadRequestException(
+          `user with username: ${username} already exits`,
+        );
+
+      const user: ICreateOneUserInput = {
+        username,
+        displayName,
+        password: this.encodeUtil.hashData(password),
+      };
+
+      return await this.usersService.createOne(user);
+    } catch (error: unknown) {
+      if (error instanceof Error)
+        this.logger.error(error.stack ? error.stack : error.message);
+      else this.logger.error(`Error: ${JSON.stringify(error)}`);
+      throw error;
+    }
+  }
+
+  async signin(input: SigninDto): Promise<{ accessToken: string }> {
+    const { username, password } = input;
+
+    try {
+      const user = await this.usersService.findOneByUsername(username);
+      if (!user)
+        throw new NotFoundException(
+          `user with username: ${username} not found`,
+        );
+
+      const passwordCorrected = this.encodeUtil.compareData(
+        password,
+        user.password,
+      );
+      if (!passwordCorrected) throw new BadRequestException('invalid password');
+
+      const accessToken = await this.generateAccessToken(user);
+
+      return accessToken;
+    } catch (error: unknown) {
+      if (error instanceof Error)
+        this.logger.error(error.stack ? error.stack : error.message);
+      else this.logger.error(`Error: ${JSON.stringify(error)}`);
+      throw error;
+    }
+  }
+
+  private async generateAccessToken(
+    input: UserDocument,
+  ): Promise<{ accessToken: string }> {
+    const { _id, username } = input;
+
+    const accessToken = await this.jwtService.signAsync(
+      { sub: _id, username },
+      {
+        secret: this.configService.get<string>('jwt.accessTokenSecret'),
+        expiresIn: this.configService.get<string>('jwt.accessTokenExpireTime'),
+        algorithm: 'HS512',
+      },
+    );
+
+    return { accessToken };
+  }
+}
