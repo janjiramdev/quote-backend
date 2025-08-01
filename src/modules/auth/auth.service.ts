@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { ICreateOneUserInput } from 'src/interfaces/user.interface';
+import { ICreateOneUserInput } from 'src/interfaces/users.interface';
 import { UserDocument } from 'src/schemas/user.schema';
 import { EncodeUtil } from 'src/utils/encode.util';
 import { UsersService } from '../users/users.service';
