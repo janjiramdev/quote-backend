@@ -8,11 +8,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { isValidObjectId, Model, Types } from 'mongoose';
+import { isValidObjectId, Model, SortOrder, Types } from 'mongoose';
 import { IUpdateQuoteTotalVotesByIdInput } from 'src/interfaces/quotes.interface';
+import { IPaginatedResponse } from 'src/interfaces/utils.interface';
 import { Quote, QuoteDocument } from 'src/schemas/quote.schema';
 import { VotesService } from '../votes/votes.service';
 import { CreateQuoteDto } from './dtos/create-quote.dto';
+import { SearchQuotesDto } from './dtos/search-quotes.dto';
 
 @Injectable()
 export class QuotesService {
@@ -39,27 +41,75 @@ export class QuotesService {
     });
   }
 
-  async findQuotes(userId: string): Promise<QuoteDocument[]> {
-    return await this.quoteModel
-      .find({
+  async findQuotes(
+    userId: string,
+    query: SearchQuotesDto,
+  ): Promise<IPaginatedResponse<QuoteDocument>> {
+    try {
+      const { page = 1, limit = 10 } = query;
+
+      const filter = {
         ownerId: { $ne: new Types.ObjectId(userId) },
         deletedAt: null,
-      })
-      .sort([
+      };
+      const sort: [string, SortOrder][] = [
         ['totalVotes', -1],
         ['createdAt', 1],
-      ])
-      .exec();
+      ];
+      const skip = (page - 1) * limit;
+
+      const [items, totalItems] = await Promise.all([
+        this.quoteModel.find(filter).sort(sort).skip(skip).limit(limit).exec(),
+        this.quoteModel.countDocuments(filter),
+      ]);
+
+      return {
+        items,
+        totalItems,
+        page,
+        limit,
+        totalPages: Math.ceil(totalItems / limit),
+      };
+    } catch (error: unknown) {
+      if (error instanceof Error)
+        this.logger.error(error.stack ? error.stack : error.message);
+      else this.logger.error(`Error: ${JSON.stringify(error)}`);
+      throw error;
+    }
   }
 
-  async findQuotesByOwnerId(userId: string): Promise<QuoteDocument[]> {
-    return await this.quoteModel
-      .find({ ownerId: new Types.ObjectId(userId), deletedAt: null })
-      .sort([
+  async findQuotesByOwnerId(
+    userId: string,
+    query: SearchQuotesDto,
+  ): Promise<IPaginatedResponse<QuoteDocument>> {
+    try {
+      const { page = 1, limit = 10 } = query;
+
+      const filter = { ownerId: new Types.ObjectId(userId), deletedAt: null };
+      const sort: [string, SortOrder][] = [
         ['totalVotes', -1],
         ['createdAt', 1],
-      ])
-      .exec();
+      ];
+      const skip = (page - 1) * limit;
+
+      const [items, totalItems] = await Promise.all([
+        this.quoteModel.find(filter).sort(sort).skip(skip).limit(limit).exec(),
+        this.quoteModel.countDocuments(filter),
+      ]);
+
+      return {
+        items,
+        totalItems,
+        page,
+        limit,
+        totalPages: Math.ceil(totalItems / limit),
+      };
+    } catch (error: unknown) {
+      if (error instanceof Error)
+        this.logger.error(error.stack ? error.stack : error.message);
+      else this.logger.error(`Error: ${JSON.stringify(error)}`);
+      throw error;
+    }
   }
 
   async findQuoteById(id: string): Promise<QuoteDocument | null | undefined> {
