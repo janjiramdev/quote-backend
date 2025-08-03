@@ -10,8 +10,8 @@ import { ICreateUserInput } from 'src/interfaces/users.interface';
 import { UserDocument } from 'src/schemas/user.schema';
 import { EncodeUtil } from 'src/utils/encode.util';
 import { UsersService } from '../users/users.service';
-import { SigninDto } from './dtos/signin.dto';
-import { SignupDto } from './dtos/singup.dto';
+import { SignInDto } from './dtos/signin.dto';
+import { SignUpDto } from './dtos/singup.dto';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +27,7 @@ export class AuthService {
     this.encodeUtil = new EncodeUtil();
   }
 
-  async signup(input: SignupDto): Promise<UserDocument> {
+  async signUp(input: SignUpDto): Promise<UserDocument> {
     const { username, displayName, password } = input;
 
     try {
@@ -52,7 +52,7 @@ export class AuthService {
     }
   }
 
-  async signin(input: SigninDto): Promise<{ accessToken: string }> {
+  async signIn(input: SignInDto): Promise<{ accessToken: string }> {
     const { username, password } = input;
 
     try {
@@ -82,10 +82,10 @@ export class AuthService {
   private async generateAccessToken(
     input: UserDocument,
   ): Promise<{ accessToken: string }> {
-    const { _id, username } = input;
+    const { _id, username, displayName } = input;
 
     const accessToken = await this.jwtService.signAsync(
-      { sub: _id, username },
+      { sub: _id, username, displayName },
       {
         secret: this.configService.get<string>('jwt.accessTokenSecret'),
         expiresIn: this.configService.get<string>('jwt.accessTokenExpireTime'),

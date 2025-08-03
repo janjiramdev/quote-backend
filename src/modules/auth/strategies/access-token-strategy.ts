@@ -20,6 +20,7 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
     return {
       _id: payload.sub,
       username: payload.username,
+      displayName: payload.displayName,
     };
   }
 }

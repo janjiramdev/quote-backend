@@ -13,7 +13,6 @@ import { IUpdateQuoteTotalVotesByIdInput } from 'src/interfaces/quotes.interface
 import { Quote, QuoteDocument } from 'src/schemas/quote.schema';
 import { VotesService } from '../votes/votes.service';
 import { CreateQuoteDto } from './dtos/create-quote.dto';
-import { UpdateQuoteByIdDto } from './dtos/update-quote-by-id.dto';
 
 @Injectable()
 export class QuotesService {
@@ -80,35 +79,6 @@ export class QuotesService {
     quote.totalVotes = totalVotes;
     quote.updatedAt = new Date();
     return await quote.save();
-  }
-
-  async updateQuoteById(
-    userId: string,
-    id: string,
-    input: UpdateQuoteByIdDto,
-  ): Promise<QuoteDocument> {
-    try {
-      const { content } = input;
-
-      if (!isValidObjectId(id))
-        throw new BadRequestException(`invalid quote id format: ${id}`);
-
-      const quote = await this.findQuoteById(id);
-      if (!quote) throw new NotFoundException(`quote with id: ${id} not found`);
-      if (quote.ownerId.toString() !== userId)
-        throw new ForbiddenException(
-          `user with id: ${userId} does not belongs to quote with id: ${id}`,
-        );
-
-      quote.content = content;
-      quote.updatedAt = new Date();
-      return await quote.save();
-    } catch (error: unknown) {
-      if (error instanceof Error)
-        this.logger.error(error.stack ? error.stack : error.message);
-      else this.logger.error(`Error: ${JSON.stringify(error)}`);
-      throw error;
-    }
   }
 
   async deleteQuoteById(userId: string, id: string): Promise<QuoteDocument> {

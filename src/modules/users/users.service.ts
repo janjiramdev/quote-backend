@@ -49,23 +49,6 @@ export class UsersService {
       .exec();
   }
 
-  async getProfile(input: string): Promise<UserDocument> {
-    try {
-      const user = await this.userModel
-        .findOne({ _id: new Types.ObjectId(input) })
-        .exec();
-      if (!user)
-        throw new NotFoundException(`user with id: ${input} not found`);
-
-      return user;
-    } catch (error: unknown) {
-      if (error instanceof Error)
-        this.logger.error(error.stack ? error.stack : error.message);
-      else this.logger.error(`Error: ${JSON.stringify(error)}`);
-      throw error;
-    }
-  }
-
   async updateProfile(
     id: string,
     input: UpdateUserByIdDto,

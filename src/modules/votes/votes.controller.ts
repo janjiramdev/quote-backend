@@ -21,7 +21,9 @@ export class VotesController {
   }
 
   @Get('user-vote')
-  async getUserVote(@CurrentUser() user: IUserInterface) {
+  async getUserVote(
+    @CurrentUser() user: IUserInterface,
+  ): Promise<VoteDocument | null | undefined> {
     return await this.votesService.getUserVote(user._id);
   }
 }

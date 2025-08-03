@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Patch, UseGuards } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user-decorator';
 import type { IUserInterface } from 'src/interfaces/users.interface';
 import { UserDocument } from 'src/schemas/user.schema';
@@ -10,11 +10,6 @@ import { UsersService } from './users.service';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  @Get('/profile')
-  async getProfile(@CurrentUser() user: IUserInterface): Promise<UserDocument> {
-    return await this.usersService.getProfile(user._id);
-  }
 
   @Patch('/update-profile')
   async updateProfile(

@@ -4,17 +4,14 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
-
 import { CurrentUser } from 'src/decorators/current-user-decorator';
 import type { IUserInterface } from 'src/interfaces/users.interface';
 import { QuoteDocument } from 'src/schemas/quote.schema';
 import { AccessTokenGuard } from '../auth/guards/access-token-guard';
 import { CreateQuoteDto } from './dtos/create-quote.dto';
-import { UpdateQuoteByIdDto } from './dtos/update-quote-by-id.dto';
 import { QuotesService } from './quotes.service';
 
 @UseGuards(AccessTokenGuard)
@@ -42,15 +39,6 @@ export class QuotesController {
     @CurrentUser() user: IUserInterface,
   ): Promise<QuoteDocument[]> {
     return await this.quotesService.findQuotesByOwnerId(user._id);
-  }
-
-  @Patch(':id')
-  async updateQuoteById(
-    @CurrentUser() user: IUserInterface,
-    @Param('id') id: string,
-    @Body() body: UpdateQuoteByIdDto,
-  ): Promise<QuoteDocument> {
-    return await this.quotesService.updateQuoteById(user._id, id, body);
   }
 
   @Delete(':id')
