@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { ICreateOneUserInput } from 'src/interfaces/users.interface';
+import { ICreateUserInput } from 'src/interfaces/users.interface';
 import { UserDocument } from 'src/schemas/user.schema';
 import { EncodeUtil } from 'src/utils/encode.util';
 import { UsersService } from '../users/users.service';
@@ -31,19 +31,19 @@ export class AuthService {
     const { username, displayName, password } = input;
 
     try {
-      const existingUser = await this.usersService.findOneByUsername(username);
+      const existingUser = await this.usersService.findUserByUsername(username);
       if (existingUser)
         throw new BadRequestException(
           `user with username: ${username} already exits`,
         );
 
-      const user: ICreateOneUserInput = {
+      const user: ICreateUserInput = {
         username,
         displayName,
         password: this.encodeUtil.hashData(password),
       };
 
-      return await this.usersService.createOne(user);
+      return await this.usersService.createUser(user);
     } catch (error: unknown) {
       if (error instanceof Error)
         this.logger.error(error.stack ? error.stack : error.message);
@@ -56,7 +56,7 @@ export class AuthService {
     const { username, password } = input;
 
     try {
-      const user = await this.usersService.findOneByUsername(username);
+      const user = await this.usersService.findUserByUsername(username);
       if (!user)
         throw new NotFoundException(
           `user with username: ${username} not found`,

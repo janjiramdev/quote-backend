@@ -34,14 +34,14 @@ export class QuotesController {
   async searchAllQuotes(
     @CurrentUser() user: IUserInterface,
   ): Promise<QuoteDocument[]> {
-    return await this.quotesService.searchAll(user._id);
+    return await this.quotesService.findQuotes(user._id);
   }
 
   @Get('search-user-quotes')
   async searchUserQuotes(
     @CurrentUser() user: IUserInterface,
   ): Promise<QuoteDocument[]> {
-    return await this.quotesService.searchUserQuotes(user._id);
+    return await this.quotesService.findQuotesByOwnerId(user._id);
   }
 
   @Patch(':id')

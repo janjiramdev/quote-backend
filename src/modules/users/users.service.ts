@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { ICreateOneUserInput } from 'src/interfaces/users.interface';
+import { Model, Types } from 'mongoose';
+import { ICreateUserInput } from 'src/interfaces/users.interface';
 import { User, UserDocument } from 'src/schemas/user.schema';
 import { EncodeUtil } from 'src/utils/encode.util';
 import { UpdateUserByIdDto } from './dtos/update-user-by-id.dto';
@@ -21,7 +21,7 @@ export class UsersService {
     this.encodeUtil = new EncodeUtil();
   }
 
-  async createOne(input: ICreateOneUserInput): Promise<UserDocument> {
+  async createUser(input: ICreateUserInput): Promise<UserDocument> {
     return await this.userModel
       .create({
         ...input,
@@ -35,7 +35,7 @@ export class UsersService {
       });
   }
 
-  async findOneByUsername(
+  async findUserByUsername(
     input: string,
   ): Promise<UserDocument | null | undefined> {
     return await this.userModel
@@ -43,13 +43,17 @@ export class UsersService {
       .select('+password');
   }
 
-  async findOneById(input: string): Promise<UserDocument | null | undefined> {
-    return await this.userModel.findOne({ _id: input }).exec();
+  async findUserById(input: string): Promise<UserDocument | null | undefined> {
+    return await this.userModel
+      .findOne({ _id: new Types.ObjectId(input) })
+      .exec();
   }
 
   async getProfile(input: string): Promise<UserDocument> {
     try {
-      const user = await this.userModel.findOne({ _id: input }).exec();
+      const user = await this.userModel
+        .findOne({ _id: new Types.ObjectId(input) })
+        .exec();
       if (!user)
         throw new NotFoundException(`user with id: ${input} not found`);
 
@@ -74,7 +78,7 @@ export class UsersService {
           `updateUser detail not found: ${JSON.stringify(input)}`,
         );
 
-      const user = await this.findOneById(id);
+      const user = await this.findUserById(id);
       if (!user) throw new NotFoundException(`user with id: ${id} not found`);
 
       if (displayName) user.displayName = displayName;

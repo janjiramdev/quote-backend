@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 @Schema({ collection: 'quote' })
 export class Quote {
@@ -9,8 +9,16 @@ export class Quote {
   @Prop({ type: Number, unique: false, required: true, nullable: false })
   totalVotes: number;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-  ownerId: string;
+  // ----- ----- ----- Relations ----- ----- ----- //
+
+  @Prop({
+    type: Types.ObjectId,
+    unique: false,
+    required: true,
+    nullable: false,
+    ref: 'User',
+  })
+  ownerId: Types.ObjectId;
 
   // ----- ----- ----- Timestamps ----- ----- ----- //
 

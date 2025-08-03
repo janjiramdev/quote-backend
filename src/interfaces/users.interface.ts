@@ -4,7 +4,7 @@ export interface IUserInterface {
   displayName?: string;
 }
 
-export interface ICreateOneUserInput {
+export interface ICreateUserInput {
   username: string;
   displayName: string;
   password: string;
