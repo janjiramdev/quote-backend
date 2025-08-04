@@ -9,3 +9,8 @@ export interface ICreateUserInput {
   displayName: string;
   password: string;
 }
+
+export interface IUpdateUserRefreshTokenInput {
+  _id: string;
+  refreshToken: string;
+}

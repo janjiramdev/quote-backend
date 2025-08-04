@@ -6,7 +6,10 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { ICreateUserInput } from 'src/interfaces/users.interface';
+import {
+  ICreateUserInput,
+  IUpdateUserRefreshTokenInput,
+} from 'src/interfaces/users.interface';
 import { User, UserDocument } from 'src/schemas/user.schema';
 import { EncodeUtil } from 'src/utils/encode.util';
 import { UpdateUserByIdDto } from './dtos/update-user-by-id.dto';
@@ -46,6 +49,19 @@ export class UsersService {
   async findUserById(input: string): Promise<UserDocument | null | undefined> {
     return await this.userModel
       .findOne({ _id: new Types.ObjectId(input) })
+      .select('+refreshToken')
+      .exec();
+  }
+
+  async updateUserRefreshToken(
+    input: IUpdateUserRefreshTokenInput,
+  ): Promise<void> {
+    const { _id, refreshToken } = input;
+    await this.userModel
+      .findOneAndUpdate(
+        { _id: new Types.ObjectId(_id) },
+        { refreshToken, updatedAt: new Date() },
+      )
       .exec();
   }
 

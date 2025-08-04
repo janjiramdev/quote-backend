@@ -18,6 +18,15 @@ export class User {
   })
   password: string;
 
+  @Prop({
+    type: String,
+    unique: false,
+    required: false,
+    nullable: true,
+    select: false,
+  })
+  refreshToken?: string;
+
   // ----- ----- ----- Timestamps ----- ----- ----- //
 
   @Prop({
