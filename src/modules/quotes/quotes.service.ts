@@ -46,15 +46,21 @@ export class QuotesService {
     query: SearchQuotesDto,
   ): Promise<IPaginatedResponse<QuoteDocument>> {
     try {
-      const { page = 1, limit = 10 } = query;
+      const {
+        search,
+        sortBy = 'createdAt',
+        sortDirection = -1,
+        page = 1,
+        limit = 10,
+      } = query;
 
       const filter = {
+        ...(search && { content: { $regex: search, $options: 'i' } }),
         ownerId: { $ne: new Types.ObjectId(userId) },
         deletedAt: null,
       };
       const sort: [string, SortOrder][] = [
-        ['totalVotes', -1],
-        ['createdAt', 1],
+        [sortBy, sortDirection as SortOrder],
       ];
       const skip = (page - 1) * limit;
 
@@ -83,12 +89,21 @@ export class QuotesService {
     query: SearchQuotesDto,
   ): Promise<IPaginatedResponse<QuoteDocument>> {
     try {
-      const { page = 1, limit = 10 } = query;
+      const {
+        search,
+        sortBy = 'createdAt',
+        sortDirection = -1,
+        page = 1,
+        limit = 10,
+      } = query;
 
-      const filter = { ownerId: new Types.ObjectId(userId), deletedAt: null };
+      const filter = {
+        ...(search && { content: { $regex: search, $options: 'i' } }),
+        ownerId: new Types.ObjectId(userId),
+        deletedAt: null,
+      };
       const sort: [string, SortOrder][] = [
-        ['totalVotes', -1],
-        ['createdAt', 1],
+        [sortBy, sortDirection as SortOrder],
       ];
       const skip = (page - 1) * limit;
 
