@@ -1,17 +1,24 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import systemConfig from './configs/system.config';
+import { ResponseExceptionsFilter } from './filters/response-exception-filter';
 import { LoggerInterceptor } from './interceptors/logger-interceptor';
 import { ResponseInterceptor } from './interceptors/response-interceptor';
-import { ResponseExceptionsFilter } from './filters/response-exception-filter';
+
+const configs = systemConfig();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: process.env.CORS_ALLOW_ORIGIN,
+    origin: configs.system.corsAllowOrigin,
     credentials: true,
   });
+
+  app.useGlobalFilters(new ResponseExceptionsFilter());
+  app.useGlobalInterceptors(new LoggerInterceptor());
+  app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -19,10 +26,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  app.useGlobalInterceptors(new LoggerInterceptor());
-  app.useGlobalInterceptors(new ResponseInterceptor());
-  app.useGlobalFilters(new ResponseExceptionsFilter());
 
-  await app.listen(process.env.APP_PORT ?? 8080);
+  await app.listen(configs.system.appPort);
 }
 void bootstrap();

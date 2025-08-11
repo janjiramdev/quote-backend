@@ -7,18 +7,18 @@ This project is quote backend services with TypeScript, NestJS and MongoDB
 ## Prerequisite
 
 - Node v20.x.x or later
-- Docker (MongoDB v8.0)
+- Docker for MongoDB v8.0
 
 ## Project setup
 
-- Setup database
+- Config env follow up .env.example
+- Setup MongoDB database
 
 ```bash
 $ docker-compose up -d
 ```
 
-- Config env follow up .env.example
-- Install NodeJS dependencies
+- Install Node dependencies
 
 ```bash
 $ npm install
@@ -36,4 +36,4 @@ $ npm run start:dev
 
 ## License
 
-[MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE)
+[MIT licensed](https://github.com/janjiramdev/quote-backend/blob/main/LICENSE)

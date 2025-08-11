@@ -8,9 +8,9 @@ export const CurrentUser = createParamDecorator(
       .getRequest();
 
     return {
-      _id: request?.user?._id,
-      username: request?.user?.username,
-      displayName: request?.user?.displayName,
+      _id: request.user._id,
+      username: request.user.username,
+      displayName: request.user.displayName,
     };
   },
 );
