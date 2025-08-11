@@ -5,11 +5,11 @@ services:
     image: mongo:8.0
     container_name: quote-database
     ports:
-      - '27017:27017'
+      - '${DATABASE_PORT}:27017'
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: P@ssw0rd
-      MONGO_INITDB_DATABASE: datasource
+      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+      MONGO_INITDB_DATABASE: ${DATABASE_NAME}
     volumes:
       - mongodb-data:/data/db
     networks:

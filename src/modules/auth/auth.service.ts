@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import {
   CJwtExpiredErrorMessage,
   CJwtInvalidErrorMessage,
+  CJwtMalformedErrorMessage,
 } from 'src/constants/jwt.constant';
 import { IAuthTokenDetail, IAuthTokens } from 'src/interfaces/auth.interface';
 import { ICreateUserInput } from 'src/interfaces/users.interface';
@@ -151,7 +152,8 @@ export class AuthService {
         throw new NotFoundException(
           `user with username: ${decodedToken.sub} not found`,
         );
-      else if (!user.refreshToken) throw new UnauthorizedException();
+      else if (!user.refreshToken)
+        throw new UnauthorizedException('invalid session');
 
       const tokenCorrected = this.encodeUtil.compareData(
         refreshToken,
@@ -172,7 +174,10 @@ export class AuthService {
 
         if (error.message === CJwtExpiredErrorMessage)
           throw new UnauthorizedException('session expired');
-        else if (error.message === CJwtInvalidErrorMessage)
+        else if (
+          error.message === CJwtInvalidErrorMessage ||
+          error.message === CJwtMalformedErrorMessage
+        )
           throw new UnauthorizedException('invalid session');
         else throw error;
       } else this.logger.error(`Error: ${JSON.stringify(error)}`);
