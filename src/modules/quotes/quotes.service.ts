@@ -21,7 +21,7 @@ export class QuotesService {
   private readonly logger: Logger;
 
   constructor(
-    @InjectModel(Quote.name) private readonly quoteModel: Model<QuoteDocument>,
+    @InjectModel(Quote.name) private readonly quoteModel: Model<Quote>,
     @Inject(forwardRef(() => VotesService)) private votesService: VotesService,
   ) {
     this.logger = new Logger(QuotesService.name);

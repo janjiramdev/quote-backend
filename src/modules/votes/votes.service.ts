@@ -18,7 +18,7 @@ export class VotesService {
   private readonly logger: Logger;
 
   constructor(
-    @InjectModel(Vote.name) private voteModel: Model<VoteDocument>,
+    @InjectModel(Vote.name) private voteModel: Model<Vote>,
     @Inject(forwardRef(() => QuotesService))
     private quotesService: QuotesService,
   ) {
